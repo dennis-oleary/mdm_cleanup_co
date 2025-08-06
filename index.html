@@ -18,11 +18,11 @@
 
   <main>
     <section id="home" class="page-section">
-      <div class="content">
+      <div class="content" id="form-section">
         <h2>Request a Free Quote</h2>
         <p>Tell us how many devices you need removed and what MDM you use. We'll respond fast with pricing and next steps.</p>
 
-        <form id="quoteForm" action="https://formspree.io/f/mzzvjykb" method="POST" onsubmit="return false;">
+        <form id="quoteForm" action="https://formspree.io/f/mzzvjykb" method="POST" onsubmit="handleFormSubmit(event)">
           <!-- Honeypot anti-spam field -->
           <label style="display:none;">Leave this field empty:
             <input type="text" name="website" autocomplete="off">
@@ -43,8 +43,8 @@
           <label for="message">Additional Notes (optional)</label>
           <textarea id="message" name="message" rows="4"></textarea>
 
-          <!-- Google reCAPTCHA with AJAX callback -->
-          <div class="g-recaptcha" data-sitekey="6LfaCZwrAAAAAGfc4tDL6WIMPr1ejP0Ojdx2fjbs" data-callback="submitFormWithCaptcha"></div>
+          <!-- Google reCAPTCHA (no auto-submit) -->
+          <div class="g-recaptcha" data-sitekey="6LfaCZwrAAAAAGfc4tDL6WIMPr1ejP0Ojdx2fjbs"></div>
 
           <button type="submit">Request Quote</button>
         </form>
@@ -55,6 +55,7 @@
       <div class="content">
         <h2>✅ Thank You!</h2>
         <p>We've received your request. Our team will be in touch shortly at the email you provided.</p>
+        <button id="backButton">⬅️ Submit Another Request</button>
       </div>
     </section>
   </main>
@@ -63,56 +64,79 @@
     &copy; 2025 MDM Cleanup Co.
   </footer>
 
-<script>
-async function submitFormWithCaptcha() {
-  const form = document.getElementById('quoteForm');
-  const button = form.querySelector('button[type="submit"]');
-  button.disabled = true;
-  button.textContent = "Submitting...";
+  <script>
+  function handleFormSubmit(e) {
+    e.preventDefault();
 
-  try {
-    // ✅ Get reCAPTCHA token explicitly
+    const button = document.querySelector('#quoteForm button[type="submit"]');
+    button.disabled = true;
+    button.textContent = "Verifying...";
+
+    // ✅ Verify reCAPTCHA token
     const token = grecaptcha.getResponse();
     if (!token) {
-      alert("Please complete the CAPTCHA.");
+      alert("Please complete the CAPTCHA before submitting.");
       button.disabled = false;
       button.textContent = "Request Quote";
       return;
     }
 
+    submitFormWithCaptcha(token);
+  }
+
+  async function submitFormWithCaptcha(token) {
+    const form = document.getElementById('quoteForm');
     const data = new FormData(form);
     data.append('g-recaptcha-response', token);
 
-    const response = await fetch(form.action, {
-      method: "POST",
-      body: data,
-      headers: { "Accept": "application/json" }
-    });
+    const button = form.querySelector('button[type="submit"]');
+    button.textContent = "Submitting...";
 
-    console.log("Response status:", response.status);
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: data,
+        headers: { "Accept": "application/json" }
+      });
 
-    if (response.ok) {
-      form.style.display = 'none';
-      const thanks = document.getElementById('thanks');
-      thanks.style.display = 'block';
-      thanks.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      const text = await response.text();
-      console.error("Formspree Error Response:", text);
-      alert("Oops! Something went wrong. (Status " + response.status + ")");
+      console.log("Response status:", response.status);
+
+      if (response.ok) {
+        document.getElementById('form-section').style.display = 'none';
+        const thanks = document.getElementById('thanks');
+        thanks.style.display = 'block';
+        thanks.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        const text = await response.text();
+        console.error("Formspree Error Response:", text);
+        alert("Oops! Something went wrong. (Status " + response.status + ")");
+        button.disabled = false;
+        button.textContent = "Request Quote";
+        grecaptcha.reset();
+      }
+    } catch (err) {
+      console.error("AJAX Exception:", err);
+      alert("Network error. Please try again.");
       button.disabled = false;
       button.textContent = "Request Quote";
       grecaptcha.reset();
     }
-  } catch (err) {
-    console.error("AJAX Exception:", err);
-    alert("Network error. Please try again.");
-    button.disabled = false;
-    button.textContent = "Request Quote";
-    grecaptcha.reset();
   }
-}
-</script>
+
+  // ✅ Back Button Logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const backBtn = document.getElementById('backButton');
+    backBtn.addEventListener('click', () => {
+      document.getElementById('thanks').style.display = 'none';
+      document.getElementById('form-section').style.display = 'block';
+      grecaptcha.reset();
+      const button = document.querySelector('#quoteForm button[type="submit"]');
+      button.disabled = false;
+      button.textContent = "Request Quote";
+      document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  </script>
 
 </body>
 </html>
