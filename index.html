@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Cut MDM licensing costs fast. MDM Cleanup Co. is your emergency MDM device deletion partner." />
+  <title>MDM Cleanup Co. | Cut MDM Licensing Costs Fast</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script>
+    const theme = localStorage.getItem('theme');
+    if (theme === 'dark') document.documentElement.classList.add('dark');
+  </script>
+</head>
+<body>
+
+  <header>
+    <h1>MDM Cleanup Co.</h1>
+    <p>Cut your MDM licensing costs fast. Delete unused devices — the right way.</p>
+  </header>
+
+  <main>
+    <section id="home" class="page-section">
+      <div class="content">
+        <h2>Request a Free Quote</h2>
+        <p>Tell us how many devices you need removed and what MDM you use. We'll respond fast with pricing and next steps.</p>
+
+        <form action="https://formspree.io/f/mzzvjykb" method="POST">
+          <input type="hidden" name="_redirect" value="https://mdmcleanup.co/#thanks">
+          <label style="display:none;">Leave this field empty:<input type="text" name="website" autocomplete="off"></label>
+
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" required />
+
+          <label for="email">Your Email</label>
+          <input type="email" id="email" name="_replyto" required />
+
+          <label for="mdm">Which MDM Are You Using?</label>
+          <input type="text" id="mdm" name="mdm" required />
+
+          <label for="devices">How Many Devices Need Deletion?</label>
+          <input type="number" id="devices" name="device_count" required />
+
+          <label for="message">Additional Notes (optional)</label>
+          <textarea id="message" name="message" rows="4"></textarea>
+
+          <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
+
+          <button type="submit">Request Quote</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="thanks" class="page-section" style="display:none">
+      <div class="content">
+        <h2>Thank You!</h2>
+        <p>We've received your request. Our team will be in touch shortly at the email you provided.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 MDM Cleanup Co.
+  </footer>
+
+</body>
+</html>
