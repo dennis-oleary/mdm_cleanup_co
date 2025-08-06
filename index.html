@@ -22,10 +22,7 @@
         <h2>Request a Free Quote</h2>
         <p>Tell us how many devices you need removed and what MDM you use. We'll respond fast with pricing and next steps.</p>
 
-        <form action="https://formspree.io/f/mzzvjykb" method="POST">
-          <!-- Redirect updated to GitHub Pages URL for testing -->
-          <input type="hidden" name="_redirect" value="https://dennis-oleary.github.io/mdm_cleanup_co/#thanks">
-          
+        <form id="quoteForm" action="https://formspree.io/f/mzzvjykb" method="POST">
           <!-- Honeypot anti-spam field -->
           <label style="display:none;">Leave this field empty:
             <input type="text" name="website" autocomplete="off">
@@ -47,7 +44,7 @@
           <textarea id="message" name="message" rows="4"></textarea>
 
           <!-- Google reCAPTCHA -->
-          <div class="g-recaptcha" data-sitekey="6LfaCZwrAAAAAGfc4tDL6WIMPr1ejP0Ojdx2fjbs"></div>
+          <div class="g-recaptcha" data-sitekey="PASTE_YOUR_SITE_KEY_HERE"></div>
 
           <button type="submit">Request Quote</button>
         </form>
@@ -65,6 +62,41 @@
   <footer>
     &copy; 2025 MDM Cleanup Co.
   </footer>
+
+  <script>
+    // AJAX Form Submission for Formspree Free Plan
+    document.getElementById('quoteForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
+
+      // Disable submit button to prevent multiple submissions
+      const button = form.querySelector('button[type="submit"]');
+      button.disabled = true;
+      button.textContent = "Submitting...";
+
+      try {
+        const response = await fetch(form.action, {
+          method: form.method,
+          body: data,
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+          form.style.display = 'none'; // Hide form
+          document.getElementById('thanks').style.display = 'block'; // Show thank-you message
+        } else {
+          alert('Oops! Something went wrong. Please try again later.');
+          button.disabled = false;
+          button.textContent = "Request Quote";
+        }
+      } catch (error) {
+        alert('Network error. Please try again later.');
+        button.disabled = false;
+        button.textContent = "Request Quote";
+      }
+    });
+  </script>
 
 </body>
 </html>
