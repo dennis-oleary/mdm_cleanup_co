@@ -23,7 +23,6 @@
         <p>Tell us how many devices you need removed and what MDM you use. We'll respond fast with pricing and next steps.</p>
 
         <form id="quoteForm" action="https://formspree.io/f/mzzvjykb" method="POST" onsubmit="handleFormSubmit(event)">
-          <!-- Honeypot anti-spam field -->
           <label style="display:none;">Leave this field empty:
             <input type="text" name="website" autocomplete="off">
           </label>
@@ -43,10 +42,10 @@
           <label for="message">Additional Notes (optional)</label>
           <textarea id="message" name="message" rows="4"></textarea>
 
-          <!-- Google reCAPTCHA (no auto-submit) -->
+          <!-- Google reCAPTCHA -->
           <div class="g-recaptcha" data-sitekey="6LfaCZwrAAAAAGfc4tDL6WIMPr1ejP0Ojdx2fjbs"></div>
 
-          <button type="submit">Request Quote</button>
+          <button type="submit" class="btn-primary">Request Quote</button>
         </form>
       </div>
     </section>
@@ -55,7 +54,7 @@
       <div class="content">
         <h2>✅ Thank You!</h2>
         <p>We've received your request. Our team will be in touch shortly at the email you provided.</p>
-        <button id="backButton">⬅️ Submit Another Request</button>
+        <button id="backButton" class="btn-primary">⬅️ Submit Another Request</button>
       </div>
     </section>
   </main>
@@ -72,7 +71,7 @@
     button.disabled = true;
     button.textContent = "Verifying...";
 
-    // ✅ Verify reCAPTCHA token
+    // ✅ Check reCAPTCHA token
     const token = grecaptcha.getResponse();
     if (!token) {
       alert("Please complete the CAPTCHA before submitting.");
@@ -99,8 +98,6 @@
         headers: { "Accept": "application/json" }
       });
 
-      console.log("Response status:", response.status);
-
       if (response.ok) {
         document.getElementById('form-section').style.display = 'none';
         const thanks = document.getElementById('thanks');
@@ -108,14 +105,14 @@
         thanks.scrollIntoView({ behavior: 'smooth' });
       } else {
         const text = await response.text();
-        console.error("Formspree Error Response:", text);
+        console.error("Formspree Error:", text);
         alert("Oops! Something went wrong. (Status " + response.status + ")");
         button.disabled = false;
         button.textContent = "Request Quote";
         grecaptcha.reset();
       }
     } catch (err) {
-      console.error("AJAX Exception:", err);
+      console.error("AJAX Error:", err);
       alert("Network error. Please try again.");
       button.disabled = false;
       button.textContent = "Request Quote";
@@ -123,7 +120,6 @@
     }
   }
 
-  // ✅ Back Button Logic
   document.addEventListener('DOMContentLoaded', () => {
     const backBtn = document.getElementById('backButton');
     backBtn.addEventListener('click', () => {
