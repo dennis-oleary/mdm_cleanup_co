@@ -23,6 +23,7 @@
         <p>Tell us how many devices you need removed and what MDM you use. We'll respond fast with pricing and next steps.</p>
 
         <form id="quoteForm" action="https://formspree.io/f/mzzvjykb" method="POST" onsubmit="return false;">
+          <!-- Honeypot anti-spam field -->
           <label style="display:none;">Leave this field empty:
             <input type="text" name="website" autocomplete="off">
           </label>
@@ -42,7 +43,7 @@
           <label for="message">Additional Notes (optional)</label>
           <textarea id="message" name="message" rows="4"></textarea>
 
-          <!-- Google reCAPTCHA with callback -->
+          <!-- Google reCAPTCHA with AJAX callback -->
           <div class="g-recaptcha" data-sitekey="6LfaCZwrAAAAAGfc4tDL6WIMPr1ejP0Ojdx2fjbs" data-callback="submitFormWithCaptcha"></div>
 
           <button type="submit">Request Quote</button>
@@ -52,7 +53,7 @@
 
     <section id="thanks" class="page-section" style="display:none">
       <div class="content">
-        <h2>Thank You!</h2>
+        <h2>✅ Thank You!</h2>
         <p>We've received your request. Our team will be in touch shortly at the email you provided.</p>
       </div>
     </section>
@@ -63,7 +64,7 @@
   </footer>
 
   <script>
-    // AJAX submission triggered by reCAPTCHA callback
+    // AJAX submission triggered by Google reCAPTCHA callback
     async function submitFormWithCaptcha() {
       const form = document.getElementById('quoteForm');
       const data = new FormData(form);
@@ -80,7 +81,9 @@
 
         if (response.ok) {
           form.style.display = 'none';
-          document.getElementById('thanks').style.display = 'block';
+          const thanks = document.getElementById('thanks');
+          thanks.style.display = 'block';
+          thanks.scrollIntoView({ behavior: 'smooth' }); // smooth scroll to thank-you message
         } else {
           alert('Oops! Something went wrong. Please try again.');
           button.disabled = false;
