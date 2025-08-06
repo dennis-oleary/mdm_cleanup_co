@@ -8,10 +8,6 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  <script>
-    const theme = localStorage.getItem('theme');
-    if (theme === 'dark') document.documentElement.classList.add('dark');
-  </script>
 </head>
 <body>
 
@@ -27,8 +23,13 @@
         <p>Tell us how many devices you need removed and what MDM you use. We'll respond fast with pricing and next steps.</p>
 
         <form action="https://formspree.io/f/mzzvjykb" method="POST">
-          <input type="hidden" name="_redirect" value="https://mdmcleanup.co/#thanks">
-          <label style="display:none;">Leave this field empty:<input type="text" name="website" autocomplete="off"></label>
+          <!-- Redirect updated to GitHub Pages URL for testing -->
+          <input type="hidden" name="_redirect" value="https://dennis-oleary.github.io/mdm_cleanup_co/#thanks">
+          
+          <!-- Honeypot anti-spam field -->
+          <label style="display:none;">Leave this field empty:
+            <input type="text" name="website" autocomplete="off">
+          </label>
 
           <label for="name">Your Name</label>
           <input type="text" id="name" name="name" required />
@@ -45,7 +46,8 @@
           <label for="message">Additional Notes (optional)</label>
           <textarea id="message" name="message" rows="4"></textarea>
 
-          <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY"></div>
+          <!-- Google reCAPTCHA -->
+          <div class="g-recaptcha" data-sitekey="6LfaCZwrAAAAAGfc4tDL6WIMPr1ejP0Ojdx2fjbs"></div>
 
           <button type="submit">Request Quote</button>
         </form>
