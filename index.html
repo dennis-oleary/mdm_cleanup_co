@@ -63,41 +63,56 @@
     &copy; 2025 MDM Cleanup Co.
   </footer>
 
-  <script>
-    // AJAX submission triggered by Google reCAPTCHA callback
-    async function submitFormWithCaptcha() {
-      const form = document.getElementById('quoteForm');
-      const data = new FormData(form);
-      const button = form.querySelector('button[type="submit"]');
-      button.disabled = true;
-      button.textContent = "Submitting...";
+<script>
+async function submitFormWithCaptcha() {
+  const form = document.getElementById('quoteForm');
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  button.textContent = "Submitting...";
 
-      try {
-        const response = await fetch(form.action, {
-          method: form.method,
-          body: data,
-          headers: { 'Accept': 'application/json' }
-        });
-
-        if (response.ok) {
-          form.style.display = 'none';
-          const thanks = document.getElementById('thanks');
-          thanks.style.display = 'block';
-          thanks.scrollIntoView({ behavior: 'smooth' }); // smooth scroll to thank-you message
-        } else {
-          alert('Oops! Something went wrong. Please try again.');
-          button.disabled = false;
-          button.textContent = "Request Quote";
-          grecaptcha.reset();
-        }
-      } catch (error) {
-        alert('Network error. Please try again.');
-        button.disabled = false;
-        button.textContent = "Request Quote";
-        grecaptcha.reset();
-      }
+  try {
+    // ✅ Get reCAPTCHA token explicitly
+    const token = grecaptcha.getResponse();
+    if (!token) {
+      alert("Please complete the CAPTCHA.");
+      button.disabled = false;
+      button.textContent = "Request Quote";
+      return;
     }
-  </script>
+
+    const data = new FormData(form);
+    data.append('g-recaptcha-response', token);
+
+    const response = await fetch(form.action, {
+      method: "POST",
+      body: data,
+      headers: { "Accept": "application/json" }
+    });
+
+    console.log("Response status:", response.status);
+
+    if (response.ok) {
+      form.style.display = 'none';
+      const thanks = document.getElementById('thanks');
+      thanks.style.display = 'block';
+      thanks.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      const text = await response.text();
+      console.error("Formspree Error Response:", text);
+      alert("Oops! Something went wrong. (Status " + response.status + ")");
+      button.disabled = false;
+      button.textContent = "Request Quote";
+      grecaptcha.reset();
+    }
+  } catch (err) {
+    console.error("AJAX Exception:", err);
+    alert("Network error. Please try again.");
+    button.disabled = false;
+    button.textContent = "Request Quote";
+    grecaptcha.reset();
+  }
+}
+</script>
 
 </body>
 </html>
