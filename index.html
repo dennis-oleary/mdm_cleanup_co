@@ -22,8 +22,7 @@
         <h2>Request a Free Quote</h2>
         <p>Tell us how many devices you need removed and what MDM you use. We'll respond fast with pricing and next steps.</p>
 
-        <form id="quoteForm" action="https://formspree.io/f/mzzvjykb" method="POST">
-          <!-- Honeypot anti-spam field -->
+        <form id="quoteForm" action="https://formspree.io/f/mzzvjykb" method="POST" onsubmit="return false;">
           <label style="display:none;">Leave this field empty:
             <input type="text" name="website" autocomplete="off">
           </label>
@@ -43,8 +42,8 @@
           <label for="message">Additional Notes (optional)</label>
           <textarea id="message" name="message" rows="4"></textarea>
 
-          <!-- Google reCAPTCHA -->
-          <div class="g-recaptcha" data-sitekey="PASTE_YOUR_SITE_KEY_HERE"></div>
+          <!-- Google reCAPTCHA with callback -->
+          <div class="g-recaptcha" data-sitekey="6LfaCZwrAAAAAGfc4tDL6WIMPr1ejP0Ojdx2fjbs" data-callback="submitFormWithCaptcha"></div>
 
           <button type="submit">Request Quote</button>
         </form>
@@ -64,13 +63,10 @@
   </footer>
 
   <script>
-    // AJAX Form Submission for Formspree Free Plan
-    document.getElementById('quoteForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const form = e.target;
+    // AJAX submission triggered by reCAPTCHA callback
+    async function submitFormWithCaptcha() {
+      const form = document.getElementById('quoteForm');
       const data = new FormData(form);
-
-      // Disable submit button to prevent multiple submissions
       const button = form.querySelector('button[type="submit"]');
       button.disabled = true;
       button.textContent = "Submitting...";
@@ -83,19 +79,21 @@
         });
 
         if (response.ok) {
-          form.style.display = 'none'; // Hide form
-          document.getElementById('thanks').style.display = 'block'; // Show thank-you message
+          form.style.display = 'none';
+          document.getElementById('thanks').style.display = 'block';
         } else {
-          alert('Oops! Something went wrong. Please try again later.');
+          alert('Oops! Something went wrong. Please try again.');
           button.disabled = false;
           button.textContent = "Request Quote";
+          grecaptcha.reset();
         }
       } catch (error) {
-        alert('Network error. Please try again later.');
+        alert('Network error. Please try again.');
         button.disabled = false;
         button.textContent = "Request Quote";
+        grecaptcha.reset();
       }
-    });
+    }
   </script>
 
 </body>
