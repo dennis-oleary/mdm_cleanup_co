@@ -19,17 +19,22 @@ No package.json, no JS framework, no test suite, no linter. There is nothing to 
 
 ## Form submission flow
 
-The quote-request form posts to Formspree (`https://formspree.io/f/mzzvjykb`), not a backend in this repo:
+The quote-request form posts to a Cloud Function (`submitLead`) in the sibling
+`mdm-cleanup-backend` project (`D:\Dev\mdm-cleanup-backend`), not Formspree —
+it used to go through Formspree but was swapped over once that backend existed:
 
 1. Submit intercepted by `handleFormSubmit` (inline script in `index.html`) — `e.preventDefault()`.
 2. reCAPTCHA v2 token read via `grecaptcha.getResponse()`; blocks submission with an alert if missing.
-3. `submitFormWithCaptcha` does a `fetch` POST (FormData + `g-recaptcha-response`) to the Formspree endpoint.
-4. On success, the form section hides and `#thanks` section is shown in its place; a "Submit Another Request" button resets `grecaptcha` and swaps the sections back.
-5. On failure (non-OK response or network error), shows an `alert`, re-enables the submit button, and resets reCAPTCHA.
+3. `submitFormWithCaptcha` does a `fetch` POST (JSON body + `g-recaptcha-response`) to
+   `https://us-central1-mdm-cleanup-backend.cloudfunctions.net/submitLead`.
+4. `submitLead` writes the lead to that project's Firestore (`leads` collection) and emails
+   a notification via Resend. The lead shows up in that project's admin inbox UI.
+5. On success, the form section hides and `#thanks` section is shown in its place; a "Submit Another Request" button resets `grecaptcha` and swaps the sections back.
+6. On failure (non-OK response or network error), shows an `alert`, re-enables the submit button, and resets reCAPTCHA.
 
-There's also a hidden honeypot field (`name="website"`, `display:none` label) for basic bot filtering before reCAPTCHA even runs.
+There's also a hidden honeypot field (`name="website"`, `display:none` label) for basic bot filtering — `submitLead` silently no-ops if it's filled in.
 
-When editing the form, keep the Formspree endpoint, the `_replyto` field name (Formspree's special field for reply-to email), and the honeypot field intact unless deliberately changing the backend integration.
+When editing the form, keep the `_replyto` field name (the backend reads it as the lead's reply email) and the honeypot field intact unless deliberately changing the backend integration. The `submitLead` function only accepts JSON bodies and only allows CORS from `https://mdmcleanup.com` — test against it from that origin, not by opening `index.html` as a local file.
 
 ## Editing notes
 
